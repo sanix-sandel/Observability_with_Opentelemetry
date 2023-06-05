@@ -3,6 +3,7 @@ from opentelemetry import trace
 from opentelemetry.semconv.trace import HttpFlavorValues, SpanAttributes
 from common import tracer
 import requests
+from opentelemetry.propagate import inject
 
 
 @tracer.start_as_current_span("browse")
@@ -11,6 +12,8 @@ def browse():
     with tracer.start_as_current_span(
         "web request", kind=trace.SpanKind.CLIENT
     ) as span:
+        headers = {}
+        inject(headers)
         url = "http://localhost:5000"
         span.set_attributes(
             {
@@ -21,7 +24,7 @@ def browse():
             }
         )
 
-        resp = requests.get(url)
+        resp = requests.get(url, headers=headers)
         span.set_attribute(
             SpanAttributes.HTTP_STATUS_CODE, resp.status_code
         )
