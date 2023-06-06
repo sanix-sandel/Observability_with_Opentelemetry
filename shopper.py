@@ -4,13 +4,14 @@ from opentelemetry.semconv.trace import HttpFlavorValues, SpanAttributes
 from common import tracer
 import requests
 from opentelemetry.propagate import inject
+from opentelemetry.trace import Status, StatusCode
 
 
 @tracer.start_as_current_span("browse")
 def browse():
     print("Visiting the grocery store")
     with tracer.start_as_current_span(
-        "web request", kind=trace.SpanKind.CLIENT
+        "web request", kind=trace.SpanKind.CLIENT, record_exception=False
     ) as span:
         headers = {}
         inject(headers)
@@ -23,11 +24,21 @@ def browse():
                 SpanAttributes.NET_PEER_IP: "127.0.0.1"
             }
         )
-
-        resp = requests.get(url, headers=headers)
-        span.set_attribute(
-            SpanAttributes.HTTP_STATUS_CODE, resp.status_code
-        )
+        span.add_event("about to send a request")
+        try:
+            resp = requests.get(url, headers=headers)
+            if resp:
+                span.set_status(Status(StatusCode.OK))
+            else:
+                span.set_status(
+                    Status(StatusCode.ERROR, "status code: {}".format(resp.status_code))
+                )
+            span.add_event("request sent", attributes={"url": url}, timestamp=0)
+            span.set_attribute(
+                SpanAttributes.HTTP_STATUS_CODE, resp.status_code
+            )
+        except Exception as err:
+            span.record_exception(err)
 
 
 @tracer.start_as_current_span("add item to cart")
