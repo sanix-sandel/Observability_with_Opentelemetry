@@ -5,7 +5,14 @@ from opentelemetry.sdk.resources import Resource
 from local_machine_resource_detector import LocalMachineResourceDetector
 from opentelemetry.semconv.resource import ResourceAttributes
 from opentelemetry.semconv.trace import SpanAttributes
+from opentelemetry.exporter.jaeger.thrift import JaegerExporter
 from flask import request
+
+
+jaeger_exporter = JaegerExporter(
+    agent_host_name='127.0.0.1',
+    agent_port=6831
+)
 
 
 def set_span_attributes_from_flask():
@@ -25,7 +32,7 @@ def set_span_attributes_from_flask():
 
 
 def configure_tracer(name, version):
-    exporter = ConsoleSpanExporter()
+    exporter = jaeger_exporter
     span_processor = BatchSpanProcessor(exporter)
     local_resource = LocalMachineResourceDetector().detect()
     resource = local_resource.merge(
@@ -39,7 +46,7 @@ def configure_tracer(name, version):
     provider = TracerProvider(resource=resource)
     provider.add_span_processor(span_processor)
     trace.set_tracer_provider(provider)
+    print("Get tracer")
     return trace.get_tracer(name, version)
 
 
-tracer = configure_tracer("shopper", "0.1.2")

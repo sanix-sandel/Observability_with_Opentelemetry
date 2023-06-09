@@ -1,10 +1,12 @@
 #! /usr/bin/env python3
 from opentelemetry import trace
 from opentelemetry.semconv.trace import HttpFlavorValues, SpanAttributes
-from common import tracer
+from common import configure_tracer
 import requests
 from opentelemetry.propagate import inject
 from opentelemetry.trace import Status, StatusCode
+
+tracer = configure_tracer("shop-service", "0.1.2")
 
 
 @tracer.start_as_current_span("browse")
