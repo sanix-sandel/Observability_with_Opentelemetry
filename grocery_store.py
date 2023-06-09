@@ -1,7 +1,7 @@
 from flask import Flask, request
 from opentelemetry.semconv.trace import HttpFlavorValues, SpanAttributes
 from opentelemetry.trace import SpanKind
-from opentelemetry import context
+from opentelemetry import context, trace
 from opentelemetry.propagate import extract, inject, set_global_textmap
 from opentelemetry.propagators.b3 import B3MultiFormat
 from opentelemetry.propagators.composite import CompositePropagator
@@ -43,6 +43,7 @@ def welcome():
 def products():
     set_span_attributes_from_flask()
     with tracer.start_as_current_span("inventory request", kind=SpanKind.CLIENT) as span:
+        trace_id = trace.get_current_span().get_span_context().trace_id
         url = "http://localhost:5001"
         span.set_attributes(
             {

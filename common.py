@@ -6,7 +6,7 @@ from local_machine_resource_detector import LocalMachineResourceDetector
 from opentelemetry.semconv.resource import ResourceAttributes
 from opentelemetry.semconv.trace import SpanAttributes
 from opentelemetry.exporter.jaeger.thrift import JaegerExporter
-import logging as log
+import logging
 from flask import request
 
 
@@ -15,8 +15,15 @@ jaeger_exporter = JaegerExporter(
     agent_port=6831
 )
 
-log.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
 
+log_formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(message)s")
+log_handler = logging.StreamHandler()
+log_handler.setLevel(logging.INFO)
+log_handler.setFormatter(log_formatter)
+
+
+log = logging.getLogger("MyLogger")
+log.addHandler(log_handler)
 
 class Log:
     def __init__(self, trace_id, msg, service):
