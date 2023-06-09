@@ -9,11 +9,12 @@ from opentelemetry.trace.propagation import tracecontext
 from common import configure_tracer, set_span_attributes_from_flask
 import requests
 
-tracer = configure_tracer("0.1.2", "grocery-store")
 app = Flask(__name__)
 
 # Using W3C and B3 propagators
 set_global_textmap(CompositePropagator([tracecontext.TraceContextTextMapPropagator(), B3MultiFormat()]))
+
+tracer = configure_tracer("grocery-service", "0.1.2")
 
 
 # We need to get the context before the decorator instantiates the span
