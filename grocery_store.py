@@ -42,7 +42,7 @@ def welcome():
 @tracer.start_as_current_span("products", kind=SpanKind.SERVER)
 def products():
     set_span_attributes_from_flask()
-    with tracer.start_as_current_span("inventory request") as span:
+    with tracer.start_as_current_span("inventory request", kind=SpanKind.CLIENT) as span:
         url = "http://localhost:5001"
         span.set_attributes(
             {
