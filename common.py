@@ -6,6 +6,7 @@ from local_machine_resource_detector import LocalMachineResourceDetector
 from opentelemetry.semconv.resource import ResourceAttributes
 from opentelemetry.semconv.trace import SpanAttributes
 from opentelemetry.exporter.jaeger.thrift import JaegerExporter
+import logging as log
 from flask import request
 
 
@@ -13,6 +14,15 @@ jaeger_exporter = JaegerExporter(
     agent_host_name='127.0.0.1',
     agent_port=6831
 )
+
+log.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+class Log:
+    def __init__(self, trace_id, msg, service):
+        self.trace_id = trace_id
+        self.msg = msg
+        self.service = service
 
 
 def set_span_attributes_from_flask():
@@ -46,7 +56,6 @@ def configure_tracer(name, version):
     provider = TracerProvider(resource=resource)
     provider.add_span_processor(span_processor)
     trace.set_tracer_provider(provider)
-    print("Get tracer")
     return trace.get_tracer(name, version)
 
 
