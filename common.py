@@ -25,6 +25,7 @@ log_handler.setFormatter(log_formatter)
 log = logging.getLogger("MyLogger")
 log.addHandler(log_handler)
 
+
 class Log:
     def __init__(self, trace_id, msg, service):
         self.trace_id = trace_id
@@ -63,6 +64,5 @@ def configure_tracer(name, version):
     provider = TracerProvider(resource=resource)
     provider.add_span_processor(span_processor)
     trace.set_tracer_provider(provider)
+
     return trace.get_tracer(name, version)
-
-
