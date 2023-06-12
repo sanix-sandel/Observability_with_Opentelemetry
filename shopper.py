@@ -1,16 +1,25 @@
 #! /usr/bin/env python3
 import json
 
+from flask import Flask, jsonify
 from opentelemetry import trace
-from opentelemetry.context import Context
 from opentelemetry.semconv.trace import HttpFlavorValues, SpanAttributes
-from common import configure_tracer, log, Log
+from common import configure_tracer, log, Log, kafka_topic, kafka_bootstrap_servers
 import requests
 from opentelemetry.propagate import inject
 from opentelemetry.trace import Status, StatusCode
+from confluent_kafka import Producer
+import json
 
 tracer = configure_tracer("shop-service", "0.1.2")
 
+app = Flask(__name__)
+
+kafka_producer = Producer(
+    {
+        'bootstrap.servers': kafka_bootstrap_servers
+    }
+)
 
 @tracer.start_as_current_span("browse")
 def browse():
@@ -28,8 +37,9 @@ def browse():
         log.info(_log)
         print(_log.trace_id)
         headers = {}
+        print(headers)
         inject(headers)
-        url = "http://localhost:5000/products"
+        url = "http://127.0.0.1:5000/products"
         span.set_attributes(
             {
                 SpanAttributes.HTTP_METHOD: "GET",
@@ -39,22 +49,27 @@ def browse():
             }
         )
         span.add_event("about to send a request")
+        resp = requests.get(url, headers=headers)
+        print(resp)
         try:
             resp = requests.get(url, headers=headers)
+            span.add_event("request sent", attributes={"url": url}, timestamp=0)
+
             if resp:
                 data = json.loads(resp.content)
-                add_item_to_cart(data)
                 span.set_status(Status(StatusCode.OK))
+                span.set_attribute(
+                    SpanAttributes.HTTP_STATUS_CODE, resp.status_code
+                )
+                return add_item_to_cart(data)
 
             else:
                 span.set_status(
                     Status(StatusCode.ERROR, "status code: {}".format(resp.status_code))
                 )
-            span.add_event("request sent", attributes={"url": url}, timestamp=0)
-            span.set_attribute(
-                SpanAttributes.HTTP_STATUS_CODE, resp.status_code
-            )
+
         except Exception as err:
+            print(err)
             span.record_exception(err)
 
 
@@ -69,12 +84,23 @@ def add_item_to_cart(data):
             }
         )
     print("add {} to cart".format(data))
+    return data
 
 
+@app.route("/")
 @tracer.start_as_current_span("visit store")
 def visit_store():
-    browse()
+    data = browse()
+    produce_event(json.dumps(data).encode('utf-8'))
+    return jsonify(data)
+
+
+@tracer.start_as_current_span("sending event to order")
+def produce_event(data):
+    key = f'{kafka_topic}-{1}'
+    kafka_producer.produce(kafka_topic, key=key, value=data)
+    kafka_producer.flush()
 
 
 if __name__ == "__main__":
-    visit_store()
+    app.run(debug=True, port=5555)
