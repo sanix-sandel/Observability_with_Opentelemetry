@@ -10,7 +10,7 @@ python order.py
 Then check jaeger UI
 
 Without Kafka
-![Alt Text](w_o_kafka.png)
+![Alt Text](without_kafka.png)
 
 With Kafka
-![Alt Text](w_kafka.png)
+![Alt Text](with_kafka.png)
