@@ -25,6 +25,10 @@ log_handler.setFormatter(log_formatter)
 log = logging.getLogger("MyLogger")
 log.addHandler(log_handler)
 
+kafka_topic = 'items'
+kafka_bootstrap_servers = '127.0.0.1:9092'
+
+
 class Log:
     def __init__(self, trace_id, msg, service):
         self.trace_id = trace_id
