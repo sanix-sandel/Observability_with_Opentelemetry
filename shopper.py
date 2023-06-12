@@ -49,8 +49,6 @@ def browse():
             }
         )
         span.add_event("about to send a request")
-        resp = requests.get(url, headers=headers)
-        print(resp)
         try:
             resp = requests.get(url, headers=headers)
             span.add_event("request sent", attributes={"url": url}, timestamp=0)
@@ -91,7 +89,7 @@ def add_item_to_cart(data):
 @tracer.start_as_current_span("visit store")
 def visit_store():
     data = browse()
-    produce_event(json.dumps(data).encode('utf-8'))
+    #produce_event(json.dumps(data).encode('utf-8'))
     return jsonify(data)
 
 
