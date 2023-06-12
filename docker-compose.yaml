@@ -1,0 +1,33 @@
+version: "3"
+
+
+services:
+  shopper-service:
+    container_name: shopper-service
+    image: sanixsandel/shopper:1.0.0
+    ports:
+      - "5555:5555"
+    networks:
+      - mynetwork
+
+
+  grocery-service:
+    container_name: grocery-service
+    image: sanixsandel/grocery:1.0.0
+    ports:
+      - "5000:5000"
+    networks:
+      - mynetwork
+
+
+  inventory-service:
+    container_name: inventory-service
+    image: sanixsandel/inventory:1.0.0
+    ports:
+      - "5001:5001"
+    networks:
+      - mynetwork
+
+
+networks:
+  mynetwork:

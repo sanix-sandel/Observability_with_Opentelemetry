@@ -30,7 +30,7 @@ def browse():
         print(_log.trace_id)
         headers = {}
         inject(headers)
-        url = "http://localhost:5000/products"
+        url = "http://grocery-service:5000/products"
         span.set_attributes(
             {
                 SpanAttributes.HTTP_METHOD: "GET",

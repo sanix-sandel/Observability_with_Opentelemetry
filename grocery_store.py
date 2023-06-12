@@ -44,7 +44,7 @@ def products():
     set_span_attributes_from_flask()
     with tracer.start_as_current_span("inventory request", kind=SpanKind.CLIENT) as span:
         trace_id = trace.get_current_span().get_span_context().trace_id
-        url = "http://localhost:5001"
+        url = "http://inventory-service:5001"
         span.set_attributes(
             {
                 SpanAttributes.HTTP_METHOD: "GET",
