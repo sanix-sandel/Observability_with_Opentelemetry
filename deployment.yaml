@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: distributed-tracing
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: shopper
+        image: sanixsandel/shopper:1.0.0
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5555
+      - name: grocery
+        image: sanixsandel/grocery:1.0.0
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+         - containerPort: 5000
+      - name: inventory
+        image: sanixsandel/inventory:1.0.0
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+         - containerPort: 5001
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: shopper-service
+spec:
+  selector:
+    app: myapp
+  type: LoadBalancer
+  ports:
+  - port: 9000
+    targetPort: 5555
+    nodePort: 30001
