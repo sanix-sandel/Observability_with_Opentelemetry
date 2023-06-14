@@ -1,0 +1,15 @@
+syntax="proto3";
+
+message DataRequest{
+  int64 total=1;
+  repeated string items=2;
+}
+
+message DataResponse{
+  string message = 1;
+}
+
+
+service notify{
+  rpc send_notif(DataRequest) returns (DataResponse);
+}

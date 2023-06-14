@@ -10,6 +10,9 @@ from opentelemetry.propagate import inject
 from opentelemetry.trace import Status, StatusCode
 from confluent_kafka import Producer
 import json
+import grpc
+from protofiles.proto_pb2_grpc import notify, notifyStub
+from protofiles.proto_pb2 import DataRequest
 
 tracer = configure_tracer("shop-service", "0.1.2")
 
@@ -21,11 +24,11 @@ kafka_producer = Producer(
     }
 )
 
+
 @tracer.start_as_current_span("browse")
 def browse():
-
     with tracer.start_as_current_span(
-        "web request", kind=trace.SpanKind.CLIENT, record_exception=True
+            "web request", kind=trace.SpanKind.CLIENT, record_exception=True
     ) as span:
         trace_id = trace.get_current_span().get_span_context().trace_id
         trace_id = '{:032x}'.format(trace_id)
@@ -73,7 +76,6 @@ def browse():
 
 @tracer.start_as_current_span("add item to cart")
 def add_item_to_cart(data):
-
     with tracer.start_as_current_span("Adding item to cart", kind=trace.SpanKind.INTERNAL) as span:
         trace_id = trace.get_current_span().get_span_context()
         span.set_attributes(
@@ -89,15 +91,42 @@ def add_item_to_cart(data):
 @tracer.start_as_current_span("visit store")
 def visit_store():
     data = browse()
-    #produce_event(json.dumps(data).encode('utf-8'))
+    produce_event(json.dumps(data).encode('utf-8'))
+    send_notification(data)
+
     return jsonify(data)
 
 
 @tracer.start_as_current_span("sending event to order")
 def produce_event(data):
+    print("Sending kafka event")
     key = f'{kafka_topic}-{1}'
     kafka_producer.produce(kafka_topic, key=key, value=data)
     kafka_producer.flush()
+
+
+@tracer.start_as_current_span("Make a gRPC call")
+def send_notification(data):
+
+    print("Calling gRPC server")
+    channel = grpc.insecure_channel("localhost:5003")
+
+    try:
+        grpc.channel_ready_future(channel).result(timeout=10)
+    except grpc.FutureTimeoutError:
+        print("grpc not responding")
+
+    # create client
+    client = notifyStub(channel)
+
+    request = DataRequest()
+
+    request.items.extend(["item 1", "item 2"])
+    request.total = 1000
+    print("sent notification using gRPC")
+
+    response = client.send_notif(request)
+    print(f"response: {response}")
 
 
 if __name__ == "__main__":

@@ -14,3 +14,7 @@ Without Kafka
 
 With Kafka
 ![Alt Text](with_kafka.png)
+
+gRPC
+![Alt Text](gRPC_Kafka.png)
+
