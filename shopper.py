@@ -102,7 +102,7 @@ def produce_event(data):
     print("Sending kafka event")
     key = f'{kafka_topic}-{1}'
     kafka_producer.produce(kafka_topic, key=key, value=data)
-    kafka_producer.flush()
+    print(kafka_producer.flush())
 
 
 @tracer.start_as_current_span("Make a gRPC call")

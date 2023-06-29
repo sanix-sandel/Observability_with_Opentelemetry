@@ -20,10 +20,10 @@ consumer = Consumer({
 def consume_event():
     consumer.subscribe([kafka_topic])
     while True:
-        data = consumer.poll(5.0)
-        if data is None:
+        event = consumer.poll(5.0)
+        if event is None:
             continue
-        print('Received event {}'.format(data))
+        data = json.loads(event.value())
         print(data)
 
 
