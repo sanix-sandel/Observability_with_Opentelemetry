@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap
+data:
+  grocery_url: http://192.168.76.2:30002
+  inventory_url: http://192.168.76.2:30003

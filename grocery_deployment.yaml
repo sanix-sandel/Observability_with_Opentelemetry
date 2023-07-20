@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grocery
+spec:
+  selector:
+    matchLabels:
+      app: grocery
+
+  template:
+    metadata:
+      labels:
+        app: grocery
+    spec:
+      containers:
+      - name: grocery
+        image: sanixsandel/grocery:1.0.1
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+         - containerPort: 5000
+        env:
+          - name: INVENTORY_URL
+            valueFrom:
+              configMapKeyRef:
+                name: configmap
+                key: inventory_url
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: grocery-service
+spec:
+  type: NodePort
+  selector:
+    app: grocery
+  ports:
+  - port: 9001
+    targetPort: 5000
+    nodePort: 30002
