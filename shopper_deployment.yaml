@@ -3,10 +3,10 @@ kind: Deployment
 metadata:
   name: shopper-deployment
 spec:
+  replicas: 3
   selector:
     matchLabels:
       app: myapp
-
   template:
     metadata:
       labels:

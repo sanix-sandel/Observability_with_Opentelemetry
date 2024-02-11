@@ -32,4 +32,5 @@ def products():
 
 
 if __name__ == "__main__":
+    print("Grocery started, The inventory url is {}".format(os.getenv("INVENTORY_URL")))
     app.run(debug=True, host='0.0.0.0', port=5000)

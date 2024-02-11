@@ -8,10 +8,8 @@ COPY requirements.txt .
 
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-ENV INVENTORY_URL=http://localhost:5001
+#ENV INVENTORY_URL=inventory_url
 
-COPY grocery_store.py .
-COPY common.py .
-COPY local_machine_resource_detector.py .
+COPY batch_job.py .
 
-CMD ["python", "grocery_store.py"]
+CMD ["python", "batch_job.py"]
