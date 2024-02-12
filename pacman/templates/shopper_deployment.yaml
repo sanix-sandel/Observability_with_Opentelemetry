@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name}}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: {{ .Values.image.containerPort }}
+        env:
+        - name: GROCERY_URL
+          valueFrom:
+            configMapKeyRef:
+              name: configmap
+              key: grocery_url
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+ name: shopper-service
+spec:
+  selector:
+    app: myapp
+  type: LoadBalancer
+  ports:
+  - port: 9000
+    targetPort: 5555
+    nodePort: 30001
