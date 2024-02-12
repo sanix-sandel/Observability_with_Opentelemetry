@@ -1,0 +1,14 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: shopper
+  namespace: argocd
+spec:
+  destination:
+    namespace: default
+    server: https://127.0.0.1:65147
+  project: default
+  source:
+    repoURL: https://github.com/sanix-sandel/Observability_with_Opentelemetry.git
+    path: /
+    targetRevision: helm
