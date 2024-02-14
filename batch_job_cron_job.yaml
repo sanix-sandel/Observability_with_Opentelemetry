@@ -1,21 +1,21 @@
-apiVersion: batch/v1
-kind: CronJob
-metadata:
-  name: batch-cronjob
-spec:
-  schedule: "*/1 * * * *"
-  jobTemplate:
-    spec:
-      template:
-        spec:
-          containers:
-          - name: my-cronjob-container
-            image: sanixsandel/batch_job:1.0.0
-            imagePullPolicy: Always
-            env:
-            - name: INVENTORY_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: configmap
-                  key: inventory_url
-          restartPolicy: OnFailure
+#apiVersion: batch/v1
+#kind: CronJob
+#metadata:
+#  name: batch-cronjob
+#spec:
+#  schedule: "*/1 * * * *"
+#  jobTemplate:
+#    spec:
+#      template:
+#        spec:
+#          containers:
+#          - name: my-cronjob-container
+#            image: sanixsandel/batch_job:1.0.0
+#            imagePullPolicy: Always
+#            env:
+#            - name: INVENTORY_URL
+#              valueFrom:
+#                configMapKeyRef:
+#                  name: configmap
+#                  key: inventory_url
+#          restartPolicy: OnFailure
