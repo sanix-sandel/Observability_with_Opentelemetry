@@ -1,21 +1,21 @@
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: before
-  annotations:
-    argocd.argoproj.io/hook: PreSync
-spec:
-  template:
-    spec:
-      containers:
-      - name: my-cronjob-container
-        image: sanixsandel/batch_job:1.0.0
-        command: ["echo", "we will start the sync for the batch"]
-        env:
-        - name: INVENTORY_URL
-          valueFrom:
-             configMapKeyRef:
-               name: configmap
-               key: inventory_url
-      restartPolicy: Never
-  backoffLimit: 0      
+# apiVersion: batch/v1
+# kind: Job
+# metadata:
+#   name: before
+#   annotations:
+#     argocd.argoproj.io/hook: PreSync
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - name: my-cronjob-container
+#         image: sanixsandel/batch_job:1.0.0
+#         command: ["echo", "we will start the sync for the batch"]
+#         env:
+#         - name: INVENTORY_URL
+#           valueFrom:
+#              configMapKeyRef:
+#                name: configmap
+#                key: inventory_url
+#       restartPolicy: Never
+#   backoffLimit: 0      
