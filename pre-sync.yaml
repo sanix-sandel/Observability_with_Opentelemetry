@@ -8,8 +8,14 @@ spec:
   template:
     spec:
       containers:
-      - name: sleep
-        image: alpine:latest 
-        command: ["echo", "pre-sync"]
+      - name: my-cronjob-container
+        image: sanixsandel/batch_job:1.0.0
+        command: ["echo", "we will start the sync for the batch"]
+        env:
+        - name: INVENTORY_URL
+          valueFrom:
+             configMapKeyRef:
+               name: configmap
+               key: inventory_url
       restartPolicy: Never
   backoffLimit: 0      
